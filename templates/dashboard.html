@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Health Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+        #dashboard {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .service-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: calc(33.333% - 20px);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        .service-card h5 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            word-break: break-all;
+            font-size: 14px;
+        }
+        .service-card p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        @media (max-width: 1200px) {
+            .service-card {
+                width: calc(50% - 20px);
+            }
+        }
+        @media (max-width: 768px) {
+            .service-card {
+                width: 100%;
+            }
+        }
+        #add-host-form {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+        }
+        #new-service-input {
+            width: calc(100% - 120px);
+            padding: 10px;
+            margin-right: 10px;
+            box-sizing: border-box;
+        }
+        #add-service-button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #add-service-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Service Health Dashboard</h1>
+    <div id="add-host-form">
+        <h2>Add New Host</h2>
+        <input type="text" id="new-service-input" placeholder="Enter host URL (e.g., http://example.com)">
+        <button id="add-service-button">Add Host</button>
+    </div>
+    
+    <div id="dashboard"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addServiceButton = document.getElementById('add-service-button');
+            const newServiceInput = document.getElementById('new-service-input');
+        
+            addServiceButton.addEventListener('click', function() {
+                const newService = newServiceInput.value.trim();
+                if (newService) {
+                    addNewService(newService);
+                    newServiceInput.value = ''; // Clear the input field
+                }
+            });
+
+            function addNewService(service) {
+                fetch('/add_service', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url: service }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        updateDashboard(); // Refresh the dashboard
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+            }
+
+            function setQualityColor(quality, element) {
+                switch (quality) {
+                    case 'Terrible':
+                        element.style.color = '#FF0000'; // Red
+                        break;
+                    case 'Very Bad':
+                        element.style.color = '#FF4500'; // OrangeRed
+                        break;
+                    case 'Bad':
+                        element.style.color = '#FFA500'; // Orange
+                        break;
+                    case 'Good':
+                        element.style.color = '#FFFF00'; // Yellow
+                        break;
+                    case 'Very Good':
+                        element.style.color = '#9ACD32'; // YellowGreen
+                        break;
+                    case 'Excellent':
+                        element.style.color = '#32CD32'; // LimeGreen
+                        break;
+                    case 'Amazing':
+                        element.style.color = '#008000'; // Green
+                        break;
+                    default:
+                        element.style.color = '#000000'; // Black (default)
+                }
+            }
+
+            function updateDashboard() {
+                fetch('/data')
+                    .then(response => response.json())
+                    .then(data => {
+                        const dashboard = document.getElementById('dashboard');
+                        dashboard.innerHTML = '';
+                        data.forEach(service => {
+                            const card = document.createElement('div');
+                            card.className = 'service-card';
+                            card.innerHTML = `
+                                <h5 title="${service.url}">${service.url}</h5>
+                                <p>Status: ${service.status_code}</p>
+                                <p>Response Time: ${service.response_time} seconds</p>
+                                <p>Quality: <span class="quality-display">${service.quality}</p>
+                            `;
+                            dashboard.appendChild(card);
+                            
+                            // Set the color for the quality display
+                            const qualityElement = card.querySelector('.quality-display');
+                            setQualityColor(service.quality, qualityElement);
+                        });
+                    });
+            }
+
+            updateDashboard();
+            setInterval(updateDashboard, 2000); // Update every 2 seconds
+        });
+    </script>
+</body>
+</html>
