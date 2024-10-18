@@ -13,7 +13,11 @@ load_dotenv()  # This loads the variables from .env file
 app = Flask(__name__)
 
 # Initialize with your existing services
-services = []
+services = [
+    "http://consultatributos.com.br:8080/api/v1/public/GetStatusService",
+    "http://consultatributos.com.br:8080/api/v3/public/GetStatusService",
+    "http://consultatributos.com.br:8080/api/v1/public/GetStatusDatabase"
+]
 
 def send_email(service_url, response_time):
     sender_email = os.getenv("EMAIL_USER")
@@ -103,6 +107,16 @@ def add_service():
         return jsonify({"success": False, "message": "Service already exists"})
     else:
         return jsonify({"success": False, "message": "Invalid service URL"})
+
+@app.route('/remove_service', methods=['POST'])
+def remove_service():
+    service_to_remove = request.json.get('url')
+    if service_to_remove and service_to_remove in services:
+        services.remove(service_to_remove)
+        return jsonify({"success": True, "message": "Service removed successfully"})
+    else:
+        return jsonify({"success": False, "message": "Service not found"}), 404
+
 
 if __name__ == '__main__':
     app.run(debug=True)
