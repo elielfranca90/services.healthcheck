@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Service Health Dashboard</title>
+
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -11,68 +12,79 @@
         padding: 20px;
         background-color: #f0f0f0;
       }
-      h1 {
+      
+      h1, #email-config-form h2 {
         color: #333;
       }
+      
       #dashboard {
         display: flex;
         flex-wrap: wrap;
         gap: 20px;
       }
-      .service-card {
+      
+      .service-card, #add-host-form, #email-config-form {
         background-color: white;
         border-radius: 8px;
         padding: 15px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      
+      .service-card {
         width: calc(33.333% - 20px);
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
       }
+      
+      .service-card h5, .service-card p {
+        margin: 5px 0;
+        font-size: 14px;
+      }
+      
       .service-card h5 {
         margin-top: 0;
         margin-bottom: 10px;
         word-break: break-all;
-        font-size: 14px;
       }
-      .service-card p {
-        margin: 5px 0;
-        font-size: 14px;
+      
+      .form-container {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: 20px;
       }
-      @media (max-width: 1200px) {
-        .service-card {
-          width: calc(50% - 20px);
-        }
-      }
-      @media (max-width: 768px) {
-        .service-card {
-          width: 100%;
-        }
-      }
-      #add-host-form {
-        margin-top: 20px;
-        margin-bottom: 20px;
+      
+      #add-host-form, #email-config-form {
+        width: 35%;
+        max-width: 400px;
+        margin: 20px 20px 20px 0;
         padding: 20px;
         background-color: #f8f8f8;
-        border-radius: 8px;
       }
-      #new-service-input {
-        width: calc(100% - 120px);
+      
+      #new-service-input, #email-config-form input {
+        width: calc(100% - 20px);
         padding: 10px;
-        margin-right: 10px;
-        box-sizing: border-box;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
       }
-      #add-service-button {
-        padding: 10px 20px;
+      
+      #add-service-button, #save-email-config {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
         background-color: #4caf50;
         color: white;
         border: none;
         border-radius: 4px;
         cursor: pointer;
       }
-      #add-service-button:hover {
+      
+      #add-service-button:hover, #save-email-config:hover {
         background-color: #45a049;
       }
+      
       .btn-danger {
         background-color: #dc3545;
         color: white;
@@ -80,21 +92,118 @@
         padding: 5px 10px;
         cursor: pointer;
       }
+      
       .btn-danger:hover {
         background-color: #c82333;
       }
+      
+      #email-config-form form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      #email-config-form div {
+        display: flex;
+        flex-direction: column;
+      }
+      
+      #email-config-form label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #555;
+      }
+      
+      #email-config-form input:focus, #new-service-input:focus {
+        outline: none;
+        border-color: #4caf50;
+        box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+      }
+      
+      @media (max-width: 1200px) {
+        .service-card {
+          width: calc(50% - 20px);
+        }
+      }
+      
+      @media (max-width: 768px) {
+        .service-card, #add-host-form, #email-config-form {
+          width: 100%;
+        }
+      
+        .form-container {
+          flex-direction: column;
+          margin-left: 0;
+        }
+      
+        #add-host-form, #email-config-form {
+          width: 90%;
+          margin: 10px auto;
+        }
+      
+        #email-config-form {
+          order: 1;
+        }
+      
+        #add-host-form {
+          order: 2;
+        }
+      }
+      
     </style>
+
   </head>
   <body>
     <h1>Service Health Dashboard</h1>
-    <div id="add-host-form">
-      <h2>Add New Host</h2>
-      <input
-        type="text"
-        id="new-service-input"
-        placeholder="Enter host URL (e.g., http://example.com)"
-      />
-      <button id="add-service-button">Add Host</button>
+
+    <div class="form-container">
+      <!-- New Email Configuration Form -->
+      <div id="email-config-form">
+        <h2>Email Configuration</h2>
+        <form>
+          <div>
+            <label for="client-email">Your email:</label>
+            <input
+              type="email"
+              id="client-email"
+              name="client-email"
+              required
+            />
+          </div>
+          <div>
+            <label for="receiver-email">Receiver email:</label>
+            <input
+              type="email"
+              id="receiver-email"
+              name="receiver-email"
+              required
+            />
+          </div>
+          <div>
+            <label for="email-password">Password:</label>
+            <input
+              type="password"
+              id="email-password"
+              name="email-password"
+              required
+            />
+          </div>
+          <button type="submit" id="save-email-config">
+            Save Email Configuration
+          </button>
+        </form>
+      </div>
+
+      <!-- New Host Form -->
+      <div id="add-host-form">
+        <h2>Add New Host</h2>
+        <input
+          type="text"
+          id="new-service-input"
+          placeholder="Enter host URL (e.g., http://example.com)"
+        />
+        <button id="add-service-button">Add Host</button>
+      </div>
     </div>
 
     <div id="dashboard"></div>
@@ -102,7 +211,9 @@
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         const addServiceButton = document.getElementById("add-service-button");
-        const removeServiceButton = document.querySelectorAll('.btn-remove-service');
+        const removeServiceButton = document.querySelectorAll(
+          ".btn-remove-service"
+        );
         const newServiceInput = document.getElementById("new-service-input");
 
         addServiceButton.addEventListener("click", function () {
@@ -197,35 +308,37 @@
         }
 
         function updateDashboard() {
-            fetch("/data")
-              .then((response) => response.json())
-              .then((data) => {
-                const dashboard = document.getElementById("dashboard");
-                dashboard.innerHTML = "";
-                data.forEach((service) => {
-                  const card = document.createElement("div");
-                  card.className = "service-card";
-                  card.innerHTML = `
+          fetch("/data")
+            .then((response) => response.json())
+            .then((data) => {
+              const dashboard = document.getElementById("dashboard");
+              dashboard.innerHTML = "";
+              data.forEach((service) => {
+                const card = document.createElement("div");
+                card.className = "service-card";
+                card.innerHTML = `
                     <h5 title="${service.url}">${service.url}</h5>
                     <p>Status: ${service.status_code}</p>
                     <p>Response Time: ${service.response_time} seconds</p>
                     <p>Quality: <span class="quality-display">${service.quality}</span></p>
                     <button class="btn-danger btn-sm btn-remove-service" data-service-url="${service.url}">Remove Service</button>
                   `;
-                  dashboard.appendChild(card);
-        
-                  // Set the color for the quality display
-                  const qualityElement = card.querySelector(".quality-display");
-                  setQualityColor(service.quality, qualityElement);
-        
-                  // Add click event listener to the "Remove Service" button
-                  const removeServiceButton = card.querySelector(".btn-remove-service");
-                  removeServiceButton.addEventListener("click", () => {
-                    removeService(service.url);
-                  });
+                dashboard.appendChild(card);
+
+                // Set the color for the quality display
+                const qualityElement = card.querySelector(".quality-display");
+                setQualityColor(service.quality, qualityElement);
+
+                // Add click event listener to the "Remove Service" button
+                const removeServiceButton = card.querySelector(
+                  ".btn-remove-service"
+                );
+                removeServiceButton.addEventListener("click", () => {
+                  removeService(service.url);
                 });
               });
-          }
+            });
+        }
 
         updateDashboard();
         setInterval(updateDashboard, 2000); // Update every 2 seconds
